@@ -216,3 +216,36 @@ If you want to verify numbers as you write, here are the source-of-truth files:
 | Cross-task transfer accuracy(source, target, K)              | `results/<model>/transfer/cross_task_transfer_matrix.json` |
 | Qwen K=0 baseline = 89.2% on n=241                           | `results/qwen_2_5_7B_instruct/ablation/comparison_summary.json` |
 | Cross-model summary plot                                     | `results/cross_model/cross_model_jaccard_summary.pdf` |
+
+---
+
+## Pre-submission analyses (added after the original submission scaffolding)
+
+Five analyses added to pre-empt the strongest reviewer objections. Each row maps an objection to the artifact that resolves it. The plan that produced these lives at `~/.cursor/plans/five_pre-submission_analyses_*.plan.md` (outside the repo).
+
+| # | Reviewer objection it pre-empts | Code | Output | Verdict (this run) |
+| ---: | --- | --- | --- | --- |
+| **2** | "Fragility is just baseline difficulty in disguise." | [`scripts/analysis/predictive_fragility.py`](scripts/analysis/predictive_fragility.py) | [`results/fragility_predictors/{correlations.csv, scatter_plots.png, REPORT.md}`](results/fragility_predictors/) | **SHARP** — \|r_baseline\|=0.093, p=0.827. Fragility does **not** correlate with baseline accuracy. Query→answer distance does correlate strongly negatively (r=−0.720, p=0.044) — flag in §5 limitations. |
+| **5** | "tab:kfe numbers can't be reproduced from the repo." | [`scripts/evaluation/{verify_kfe.sh, verify_kfe.py, compute_kfe_correlations.py, compute_target_sensitivity.py}`](scripts/evaluation/) | [`results/cross_model/kfe/{kfe_table.csv, kfe_report.md, VERIFICATION.md}`](results/cross_model/kfe/) | **PASS** — all 6 asserted rows reproduce within EPS=0.05 (max Δ=0.0035). |
+| **4** | "Cross-model retrieval-head pools — varies vs random alignment, or vs expected alignment?" | [`scripts/analysis/cross_model_union_overlap.py`](scripts/analysis/cross_model_union_overlap.py) | [`results/cross_model/{cross_model_union_overlap.csv, cross_model_union_overlap_plot.png, cross_model_union_overlap_REPORT.md}`](results/cross_model/) | **WEAKER THAN HYPOTHESISED** — at K=16, lifts are 0.0×–1.7× across pairs (not the 5–10× we hypothesised). §4 prose pivots to **per-model phenomenon**, not a shared substrate claim. |
+| **1** | "Tasks differ in fragility — but is the fragility signature *layer-localised*?" | [`scripts/analysis/layer_distribution.py`](scripts/analysis/layer_distribution.py) | [`results/layer_analysis/{REPORT.md, per_task_layer_histograms.png, fragile_vs_robust_overlay.png, layer_concentration_table.csv, permutation_tests.csv}`](results/layer_analysis/) | **NOT SIGNIFICANT** — best p-value across 5 models is 0.107 (OLMo-base); permutation test does not detect a layer-localised circuit. §4 prose reports histograms descriptively without a mechanistic claim. |
+| **3** | "Any partially-overlapping detection method would look like this — QRScore might just be picking 16 heads with non-zero relevance by chance." | [`scripts/evaluation/{random_head_null.py, random_head_null.sh}`](scripts/evaluation/) | [`results/random_head_null/REQUIRES_GPU.md`](results/random_head_null/REQUIRES_GPU.md) (script + wrapper + run instructions) | **GPU PENDING** — script and wrapper are committed, runs require CUDA + HF cache. See [`REQUIRES_GPU.md`](results/random_head_null/REQUIRES_GPU.md) for the four-tier deployment table keyed off smoke-test timing. |
+
+### What this means for the paper draft
+
+- **Tasks 5, 2 land favourably**: K-FE table reproduces, baseline-difficulty objection killed.
+- **Tasks 1, 4 land in the fallback case**: no significant layer localisation; no shared cross-model substrate at K=16. Both findings reframe §4 from declarative to descriptive — defensible per the CFP, but the paper draft needs to be written for the **fallback narratives**, not the favourable ones.
+- **Task 3 outstanding**: GPU-only; script ready to run. Pooled SEC ablation claim (already supported by existing data) is unaffected by the outcome.
+
+### Pre-submission analysis source files
+
+| Path | Purpose |
+| ---- | ------- |
+| `scripts/analysis/predictive_fragility.py` | Task 2 — fragility vs baseline / query-distance / answer-length |
+| `scripts/analysis/cross_model_union_overlap.py` | Task 4 — Jaccard + overlap-coefficient on per-model union of top-K heads |
+| `scripts/analysis/layer_distribution.py` | Task 1 — layer entropy + permutation + Mann-Whitney U |
+| `scripts/evaluation/verify_kfe.sh` | Task 5 — wrapper for `compute_kfe_correlations.py` against local matrices |
+| `scripts/evaluation/verify_kfe.py` | Task 5 — assertion harness; nonzero exit if `tab:kfe` drifts past EPS=0.05 |
+| `scripts/evaluation/random_head_null.py` | Task 3 — random-16-head ablation null distribution (GPU) |
+| `scripts/evaluation/random_head_null.sh` | Task 3 — four-tier wrapper: smoke / full / half / llama |
+| `data/niah_input/*_test.json` | Task 2 input — re-fetched 8 NIAH evaluation files (~15 MB) |

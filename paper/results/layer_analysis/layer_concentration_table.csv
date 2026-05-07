@@ -1,0 +1,41 @@
+model,task,n_heads,n_layers_with_heads,mode_layer,layer_entropy,is_fragile
+Llama-3.1-8B-Instruct,ceo_lastname,16,4,13,1.282,True
+Llama-3.1-8B-Instruct,employees_count_total,16,5,14,1.5438,True
+Llama-3.1-8B-Instruct,headquarters_city,16,10,14,2.0964,False
+Llama-3.1-8B-Instruct,headquarters_state,16,8,14,1.9231,False
+Llama-3.1-8B-Instruct,holder_record_amount,16,4,13,1.1627,False
+Llama-3.1-8B-Instruct,incorporation_state,16,7,13,1.6675,True
+Llama-3.1-8B-Instruct,incorporation_year,16,7,14,1.7498,True
+Llama-3.1-8B-Instruct,registrant_name,16,10,10,2.1873,False
+Mistral-7B-Instruct,ceo_lastname,16,7,19,1.808,True
+Mistral-7B-Instruct,employees_count_total,16,9,16,1.9274,True
+Mistral-7B-Instruct,headquarters_city,16,9,19,1.977,False
+Mistral-7B-Instruct,headquarters_state,16,9,19,1.977,False
+Mistral-7B-Instruct,holder_record_amount,16,7,16,1.7171,False
+Mistral-7B-Instruct,incorporation_state,16,8,16,1.9062,True
+Mistral-7B-Instruct,incorporation_year,16,8,19,1.9601,True
+Mistral-7B-Instruct,registrant_name,16,8,19,1.8577,False
+OLMo-7B-Instruct,ceo_lastname,16,6,21,1.6348,True
+OLMo-7B-Instruct,employees_count_total,16,8,21,1.7153,True
+OLMo-7B-Instruct,headquarters_city,16,9,21,1.8346,False
+OLMo-7B-Instruct,headquarters_state,16,10,21,2.014,False
+OLMo-7B-Instruct,holder_record_amount,16,8,21,1.748,False
+OLMo-7B-Instruct,incorporation_state,16,10,21,1.9213,True
+OLMo-7B-Instruct,incorporation_year,16,10,21,1.9213,True
+OLMo-7B-Instruct,registrant_name,16,8,21,1.8407,False
+OLMo-7B (base),ceo_lastname,16,7,21,1.6286,True
+OLMo-7B (base),employees_count_total,16,7,21,1.6286,True
+OLMo-7B (base),headquarters_city,16,5,21,1.4075,False
+OLMo-7B (base),headquarters_state,16,4,21,1.3209,False
+OLMo-7B (base),holder_record_amount,16,5,21,1.4075,False
+OLMo-7B (base),incorporation_state,16,5,21,1.4226,True
+OLMo-7B (base),incorporation_year,16,5,21,1.4226,True
+OLMo-7B (base),registrant_name,16,5,30,1.4615,False
+Qwen2.5-7B-Instruct,ceo_lastname,16,10,19,2.1873,True
+Qwen2.5-7B-Instruct,employees_count_total,16,7,22,1.7171,True
+Qwen2.5-7B-Instruct,headquarters_city,16,5,19,1.5808,False
+Qwen2.5-7B-Instruct,headquarters_state,16,6,19,1.6675,False
+Qwen2.5-7B-Instruct,holder_record_amount,16,8,19,1.8364,False
+Qwen2.5-7B-Instruct,incorporation_state,16,5,16,1.4898,True
+Qwen2.5-7B-Instruct,incorporation_year,16,5,16,1.5596,True
+Qwen2.5-7B-Instruct,registrant_name,16,7,16,1.7868,False

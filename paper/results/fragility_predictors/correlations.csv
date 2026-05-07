@@ -1,0 +1,13 @@
+task,fragility,baseline_accuracy,query_answer_distance,answer_token_length
+ceo_lastname,0.430754,0.911508,9.0,1.0
+employees_count_total,0.69184,0.930556,64.0,1.0
+headquarters_city,0.336186,0.962302,148.0,1.0
+headquarters_state,0.218364,0.881173,856.0,1.0
+holder_record_amount,0.398437,0.527778,220.0,1.0
+incorporation_state,0.415365,0.975694,287.5,1.0
+incorporation_year,0.472743,0.830556,189.0,1.0
+registrant_name,0.109925,0.964092,519.0,3.0
+_summary_,,,,
+corr:baseline_accuracy,,r=-0.093 p=0.827,"CI=[-0.652,+0.331]",rho=-0.214 p=0.61
+corr:query_answer_distance,,r=-0.720 p=0.044,"CI=[-0.960,-0.266]",rho=-0.714 p=0.0465
+corr:answer_token_length,,r=-0.639 p=0.0884,"CI=[-0.977,-0.502]",rho=-0.577 p=0.134

@@ -41,10 +41,11 @@ python scripts/data_prep/build_niah_data.py --chunk_words 400
 | Upstream path                                | What it is |
 | -------------------------------------------- | ---------- |
 | `data/long_context_detection_optionA/*.json` | Long-context training instances used to score heads (Step 5 input) |
-| `data/niah_input/*_test.json`                | NIAH evaluation instances (Step 6+ input) |
 | `results/detection/<model>/_inputs/combined_detection.generated.json` | Pre-tokenised detection inputs (96 MB for OLMo) |
 
 **Recovery:** Re-run the build scripts above, or `git checkout <branch> -- data/`.
+
+> **Note:** `data/niah_input/*_test.json` was previously listed here as filtered. It has been **re-fetched** into `paper/data/niah_input/` (~15 MB across 8 files) for the predictive-fragility analysis (Task 2 of the pre-submission analyses); see [`results/fragility_predictors/REPORT.md`](results/fragility_predictors/REPORT.md). It is now considered an included asset, not a filtered one.
 
 ### Per-instance generation logs (~7 MB)
 

@@ -84,8 +84,31 @@ paper/
 │   ├── olmo_7B/                   ← OPEN-WEIGHTS REPLICATION
 │   │   ├── base/                  ← OLMo-7B (head-similarity only)
 │   │   └── instruct/              ← OLMo-7B-Instruct (head-similarity only)
-│   └── cross_model/               ← cross-model Jaccard summary (Llama vs Qwen
-│                                    vs Mistral vs OLMo top-K head sets)
+│   ├── cross_model/               ← cross-model Jaccard summary (Llama vs Qwen
+│   │                                vs Mistral vs OLMo top-K head sets)
+│   │   ├── kfe/                   ← K-FE table reproduction + verification
+│   │   │   ├── kfe_table.csv
+│   │   │   ├── kfe_report.md
+│   │   │   └── VERIFICATION.md    ← Task 5 PASS record
+│   │   ├── cross_model_union_overlap.csv   ← Task 4 output
+│   │   ├── cross_model_union_overlap_plot.png
+│   │   └── cross_model_union_overlap_REPORT.md
+│   ├── fragility_predictors/      ← Task 2 — predictive fragility check
+│   │   ├── correlations.csv
+│   │   ├── scatter_plots.png
+│   │   └── REPORT.md              ← VERDICT: SHARP (|r_baseline|=0.093)
+│   ├── layer_analysis/            ← Task 1 — layer-position analysis
+│   │   ├── per_task_layer_histograms.png
+│   │   ├── fragile_vs_robust_overlay.png
+│   │   ├── layer_concentration_table.csv
+│   │   ├── permutation_tests.csv
+│   │   └── REPORT.md              ← VERDICT: NOT SIGNIFICANT (best p=0.107)
+│   └── random_head_null/          ← Task 3 — GPU pending
+│       └── REQUIRES_GPU.md        ← run instructions + four-tier deployment table
+│
+├── data/
+│   └── niah_input/                ← 8 *_test.json files (re-fetched, ~15 MB)
+│                                    used by Task 2 query→answer-distance metric
 │
 ├── detection/                     ← head ranking JSONs (small, ~5MB total)
 │   ├── llama_3_1_8B_instruct/     ← per-task + combined + topk slices
@@ -111,12 +134,20 @@ paper/
 │   ├── data_prep/                 ← split_dataset.py, build_detection_data.py,
 │   │                                build_niah_data.py
 │   ├── detection/                 ← detect_qrhead.py, run_detection.sh
-│   └── evaluation/                ← run_ablation.py, plot_ablation.py,
-│                                    plot_transfer.py, verify_leakage.py,
-│                                    compute_confidence_intervals.py,
-│                                    compute_cross_method_overlap.py,
-│                                    plot_task_head_jaccard.py,
-│                                    plot_nq_ablation_heatmap.py
+│   ├── evaluation/                ← run_ablation.py, plot_ablation.py,
+│   │                                plot_transfer.py, verify_leakage.py,
+│   │                                compute_confidence_intervals.py,
+│   │                                compute_cross_method_overlap.py,
+│   │                                plot_task_head_jaccard.py,
+│   │                                plot_nq_ablation_heatmap.py,
+│   │                                compute_kfe_correlations.py,
+│   │                                compute_target_sensitivity.py,
+│   │                                verify_kfe.{sh,py},
+│   │                                random_head_null.{py,sh}     ← GPU
+│   └── analysis/                  ← post-hoc, CPU-only
+│       ├── predictive_fragility.py     (Task 2)
+│       ├── cross_model_union_overlap.py (Task 4)
+│       └── layer_distribution.py       (Task 1)
 │
 ├── src/
 │   ├── qrretriever/               ← core package (attn_retriever.py,
@@ -126,6 +157,20 @@ paper/
 │
 └── assets/qrheadlogo.png
 ```
+
+### Pre-submission analyses summary
+
+Five additional analyses have been added on top of the original submission scaffolding to pre-empt reviewer objections. Four are CPU-only and have been run; one (Task 3 random-head null) requires a GPU box and is staged with full run instructions.
+
+| # | Task | Status | Verdict |
+| ---: | --- | --- | --- |
+| 2 | Predictive fragility check | DONE (CPU) | **SHARP** — \|r_baseline\|=0.093, p=0.827. Fragility ≠ baseline difficulty. |
+| 5 | K-FE table verification | DONE (CPU) | **PASS** — all 6 rows reproduce within EPS=0.05. |
+| 4 | Cross-model union overlap | DONE (CPU) | **WEAKER THAN HYPOTHESISED** — lifts 0.0×–1.7× at K=16 (we'd hoped 5–10×). §4 pivots to per-model phenomenon. |
+| 1 | Layer-position analysis | DONE (CPU) | **NOT SIGNIFICANT** — best perm p=0.107 (OLMo-base). §4 reports descriptive histograms only, no mechanistic claim. |
+| 3 | Random-head null distribution | **GPU PENDING** | Script + four-tier wrapper committed. See [`results/random_head_null/REQUIRES_GPU.md`](results/random_head_null/REQUIRES_GPU.md). |
+
+See [`INVENTORY.md`](INVENTORY.md) → "Pre-submission analyses" for the full file-level mapping and the contingency narrative each verdict implies for §4 of the paper.
 
 ---
 
