@@ -140,6 +140,62 @@ holds just the top K heads for K ∈ {8, 16, 32, 48, 64, 96, 128, 128}.
 | File | Why |
 | ---- | --- |
 | `reference/2506.09944v2.pdf` | Wu et al., the QRRetriever paper this submission builds on. We extend their method by (a) testing in a structurally different domain (SEC fact extraction vs. NQ/BEIR retrieval), (b) adding cross-task transfer + specificity analysis, (c) running random-baseline + bootstrap-CI controls, and (d) replicating across four open-weights models. |
+| `findings/upstream_results_tex_excerpt.tex` | The `mistral_exp` branch's `results.tex` (167 lines), which contains the K-FE table (`tab:kfe`) and surrounding prose. Pulled here for reference because the published paper draft was never on `main` or the cleanup branch. |
+
+---
+
+## Forensics — `tab:kfe` (K-FE cross-model table)
+
+**Question:** are the K-FE numbers in `tab:kfe` (Llama–Qwen 0.18 / 0.02,
+Llama–Mistral 0.47 / 0.04, Qwen–Mistral 0.59 / 0.15) actually computed from
+data in this repo, or did the analysis happen off-repo?
+
+**Answer:** the numbers are **reproducible from data we already have**, but
+the **original code path was not preserved**. The script that lives in our
+repo (`scripts/evaluation/compute_kfe_correlations.py`) is a *forensic
+reconstruction* committed to `mistral_exp` after the fact, not the original
+production code.
+
+| File                                                              | What it is |
+| ----------------------------------------------------------------- | ---------- |
+| `scripts/evaluation/compute_target_sensitivity.py`                | Builds the (task × K) sensitivity / efficacy matrices from each model's `cross_task_transfer_matrix.json`. Source-of-truth for the matrix definitions. |
+| `scripts/evaluation/compute_kfe_correlations.py`                  | Computes the K-FE R² values reported in `tab:kfe`. The script's docstring explicitly states: *"Because the original definition of 'efficacy' wasn't preserved in code anywhere in the repo, we evaluate four plausible source-centric measures and report all of them."* It tests four candidate efficacy definitions and reports which best matches the published values. |
+| `results/cross_model/kfe/kfe_table.csv`                           | Long-form output: derived K-FE R² for sensitivity (one definition) and efficacy (four definitions) vs the published values, plus absolute deviations. |
+| `results/cross_model/kfe/kfe_report.md`                           | Human-readable verdict. |
+
+**What was confirmed:**
+
+- **Sensitivity (target-centric)** — total |Δ| from published = **0.008**.
+  Definition is unambiguous: `sensitivity[t][K] = mean over sources s of drop[s][t][K]`.
+  Reproduces 0.18 / 0.47 / 0.59 to 3 decimals.
+- **Efficacy (source-centric)** — only one of four candidate definitions
+  reproduces the published numbers: `efficacy[s][K] = mean over t≠s of drop[s][t][K]`
+  (i.e. `off_target_mean`). Total |Δ| = **0.007** with that definition.
+  The other three candidates miss by 0.13–0.82.
+
+**What this means for the paper:**
+
+- The published `tab:kfe` numbers can be regenerated from
+  `cross_task_transfer_matrix.json` files we already ship for every model.
+- The residualization step is straightforward: subtract within-K column
+  means from each (task, K) cell, flatten to a 56-element vector, take
+  Pearson R² between two models. No hidden model-fitting or off-repo data.
+- **Caveat to flag in writing:** the "efficacy" definition the paper uses
+  is *off-target mean drop*, but the table caption only says "source
+  efficacy" without a formula. We should either (a) inline the formula in
+  the caption, or (b) cite `compute_kfe_correlations.py` for the full
+  definition. The current draft does neither.
+
+**To re-run (one command):**
+
+```bash
+python scripts/evaluation/compute_kfe_correlations.py \
+  --inputs \
+    "Llama-3.1-8B-Instruct=results/llama_3_1_8B_instruct/transfer/cross_task_transfer_matrix.json" \
+    "Qwen2.5-7B-Instruct=results/qwen_2_5_7B_instruct/transfer/cross_task_transfer_matrix.json" \
+    "Mistral-7B-Instruct-v0.3=results/mistral_7B_instruct/transfer/cross_task_transfer_matrix.json" \
+  --output_dir results/cross_model/kfe
+```
 
 ---
 
