@@ -120,13 +120,17 @@ paper/
 │
 ├── figures/
 │   ├── main/                      ← curated set proposed for the paper body
-│   │   ├── fig1_llama_accuracy_vs_knockout.png   (Experiment 1)
-│   │   ├── fig2_llama_per_task_curves.png        (per-task sensitivity)
-│   │   ├── fig3_llama_transfer_K16.png           (Experiment 2)
+│   │   ├── fig1_apples_to_apples_llama.{pdf,png}     (4-method apples-to-apples
+│   │   │                                              drop curves on shared n=192)
+│   │   ├── fig2_kfe_asymmetry.{pdf,png}              (K-FE: target-sens vs
+│   │   │                                              source-eff scatter, 3 pairs)
+│   │   ├── fig1_llama_accuracy_vs_knockout.png       (legacy; pre-reaggregation)
+│   │   ├── fig2_llama_per_task_curves.png            (per-task sensitivity)
+│   │   ├── fig3_llama_transfer_K16.png               (Experiment 2)
 │   │   ├── fig4_llama_specificity_drop_panels.png
-│   │   ├── fig5_qwen_accuracy_vs_knockout.png    (replication)
-│   │   ├── fig6_qwen_head_similarity.png         (functional clusters)
-│   │   └── fig7_cross_model_jaccard_summary.pdf  (cross-model)
+│   │   ├── fig5_qwen_accuracy_vs_knockout.png        (replication)
+│   │   ├── fig6_qwen_head_similarity.png             (functional clusters)
+│   │   └── fig7_cross_model_jaccard_summary.pdf      (cross-model)
 │   └── cross_ablation_curves/     ← 64 source-target accuracy curves
 │                                    (8×8 task pairs, appendix material)
 │
@@ -144,10 +148,13 @@ paper/
 │   │                                compute_target_sensitivity.py,
 │   │                                verify_kfe.{sh,py},
 │   │                                random_head_null.{py,sh}     ← GPU
-│   └── analysis/                  ← post-hoc, CPU-only
-│       ├── predictive_fragility.py     (Task 2)
-│       ├── cross_model_union_overlap.py (Task 4)
-│       └── layer_distribution.py       (Task 1)
+│   ├── analysis/                  ← post-hoc, CPU-only
+│   │   ├── predictive_fragility.py     (Task 2)
+│   │   ├── cross_model_union_overlap.py (Task 4)
+│   │   └── layer_distribution.py       (Task 1)
+│   └── figures/                   ← regenerate the figures in figures/main/
+│       ├── make_fig1_apples_to_apples.py
+│       └── make_fig2_kfe_asymmetry.py
 │
 ├── src/
 │   ├── qrretriever/               ← core package (attn_retriever.py,

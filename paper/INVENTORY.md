@@ -249,3 +249,18 @@ Five analyses added to pre-empt the strongest reviewer objections. Each row maps
 | `scripts/evaluation/random_head_null.py` | Task 3 — random-16-head ablation null distribution (GPU) |
 | `scripts/evaluation/random_head_null.sh` | Task 3 — four-tier wrapper: smoke / full / half / llama |
 | `data/niah_input/*_test.json` | Task 2 input — re-fetched 8 NIAH evaluation files (~15 MB) |
+| `scripts/figures/make_fig1_apples_to_apples.py` | Re-aggregates the four-method drop curves on the **same n=192** SEC subset (LME/NQ/Random restricted to SEC's evaluated indices), so the baselines are comparable. Writes `figures/main/fig1_apples_to_apples_llama.{pdf,png}`. |
+| `scripts/figures/make_fig2_kfe_asymmetry.py` | Two-panel scatter (target sensitivity vs source efficacy) of K-residualized vectors, one point per (task, K) cell, three model pairs. Visual companion to `tab:kfe`. Writes `figures/main/fig2_kfe_asymmetry.{pdf,png}`. |
+
+### Apples-to-apples re-aggregation (Llama, n=192, K=16)
+
+Restricting LME/NQ/Random to the same 192 instance indices SEC was evaluated on:
+
+| Method | K=0 acc | K=16 acc | Drop |
+| --- | ---: | ---: | ---: |
+| QRScore-SEC | 91.1% | 39.6% | **51.6pp** |
+| QRScore-LME | 90.6% | 22.4% | **68.2pp** |
+| QRScore-NQ  | 90.6% | 86.5% | 4.2pp |
+| Random (3-seed mean) | 90.6% | 88.2% | 2.4pp |
+
+These are the numbers to cite in §3 of the paper if a reviewer challenges the original FINDINGS.md tables for using slightly different baselines (the original `comparison_summary.json` uses each method's own K=0 baseline, not the apples-to-apples shared subset).
