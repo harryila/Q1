@@ -110,7 +110,7 @@ We do not claim circuit-level understanding. The evidence is ablation-only, the 
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\columnwidth]{figures/main/fig1_apples_to_apples_llama.pdf}
+\includegraphics[width=\columnwidth]{figures/fig1_apples_to_apples_llama.pdf}
 \caption{Apples-to-apples accuracy curves on the Llama-3.1-8B-Instruct $n{=}192$ SEC subset. QRScore-SEC and QRScore-LME ablations cause large drops; QRScore-NQ ablation is statistically indistinguishable from the random baseline at small $K$. The QRScore-LME effect on Llama is much larger than on Qwen or Mistral (\Cref{sec:limitations}). Source: \texttt{paper/results/llama\_3\_1\_8B\_instruct/raw\_results/}, restricted to the $192$ SEC instances. Generation script: \texttt{paper/scripts/figures/make\_fig1\_apples\_to\_apples.py}.}
 \label{fig:apples}
 \end{figure}
@@ -124,7 +124,7 @@ The cross-task transfer matrix shows that this effect is broadly distributed wit
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.92\textwidth]{figures/main/fig2_kfe_asymmetry.pdf}
+\includegraphics[width=0.92\textwidth]{figures/fig2_kfe_asymmetry.pdf}
 \caption{$K$-residualized cross-model correlations of (left) target sensitivity, the per-task column mean of the drop matrix, and (right) source efficacy, the per-task off-target row mean. Each point is one (task, $K$) cell. Target sensitivity correlates substantially across all three model pairs ($R^2 = 0.18$--$0.59$); source efficacy is essentially uncorrelated ($R^2 \leq 0.15$). The asymmetry in $R^2$ is $4$--$12\times$. Source: \texttt{paper/results/cross\_model/kfe/kfe\_table.csv} verified against per-model \texttt{cross\_task\_transfer\_matrix.json} via \texttt{paper/scripts/evaluation/verify\_kfe.sh}; full table in \Cref{app:kfe}.}
 \label{fig:kfe}
 \end{figure*}
@@ -138,7 +138,7 @@ This asymmetry is not a numerical artefact of the residualization. The four cand
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\columnwidth]{paper/results/cross_model/cross_model_union_overlap_plot.png}
+\includegraphics[width=\columnwidth]{figures/cross_model_union_overlap_plot.png}
 \caption{Cross-model union-overlap of per-model retrieval-head pools $U_M(K) = \bigcup_t \mathcal{H}^{(t)}_K$. \textbf{Left}: Jaccard for matched-population pairs (Llama / Mistral / OLMo-Instruct, all $1024$ heads). \textbf{Right}: overlap coefficient for all four models including Qwen ($784$ heads). Dotted lines are empirical random expectation from $1000$ random subset pairs. At $K{=}16$, observed lifts above random are $0.0\times$--$1.7\times$ across pairs. Source: \texttt{paper/results/cross\_model/cross\_model\_union\_overlap.csv}.}
 \label{fig:overlap}
 \end{figure}
@@ -252,7 +252,7 @@ The verification harness (\texttt{paper/scripts/evaluation/verify\_kfe.py}) asse
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{paper/results/fragility_predictors/scatter_plots.png}
+\includegraphics[width=\textwidth]{figures/scatter_plots.png}
 \caption{Cross-model fragility (mean target sensitivity across the three models, $K \in \{8, 16\}$) plotted against three candidate predictors. Fragility does not correlate with baseline task accuracy ($r{=}{-}0.09$, $p{=}0.83$) but correlates negatively with within-document query-to-answer word distance ($r{=}{-}0.72$, $p{=}0.04$) and answer token length ($r{=}{-}0.64$, $p{=}0.09$). The eight task labels are visible on each panel. Source: \texttt{paper/results/fragility\_predictors/correlations.csv}.}
 \label{fig:predict-app}
 \end{figure}
@@ -262,14 +262,14 @@ The verification harness (\texttt{paper/scripts/evaluation/verify\_kfe.py}) asse
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.62\textwidth]{paper/figures/main/fig3_llama_transfer_K16.png}
+\includegraphics[width=0.62\textwidth]{figures/fig3_llama_transfer_K16.png}
 \caption{Cross-task transfer drop matrix at $K{=}16$ on Llama. Rows are source tasks (heads ablated); columns are target tasks (evaluation). Random-seed rows at the bottom serve as the random-ablation control. Off-diagonal cells are typically as red as on-diagonal cells---the substrate effect.}
 \label{fig:transfer}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.85\textwidth]{paper/figures/main/fig2_llama_per_task_curves.png}
+\includegraphics[width=0.85\textwidth]{figures/fig2_llama_per_task_curves.png}
 \caption{Per-task accuracy curves for QRScore-SEC ablation on Llama. Shaded bands are bootstrap $95\%$ CIs. Numeric/name tasks (\texttt{employees\_count\_total}, \texttt{ceo\_lastname}) collapse rapidly; entity tasks (\texttt{headquarters\_state}, \texttt{registrant\_name}) degrade gradually. The $K{=}64$ bump on the pooled curve is sampling noise (Findings note).}
 \end{figure}
 
@@ -296,7 +296,7 @@ Qwen2.5-7B-Instruct   & 1.738 & 1.718 & 0.942 & 0.686 \\
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{paper/results/layer_analysis/fragile_vs_robust_overlay.png}
+\includegraphics[width=\textwidth]{figures/fragile_vs_robust_overlay.png}
 \caption{Fragile (blue) and robust (orange) per-task layer distributions on a relative-depth axis. The two distributions are visually similar within each model. We do not detect a fragility signature in layer position.}
 \end{figure}
 
@@ -328,7 +328,7 @@ Mistral-7B-Instruct-v0.3    & $-37.0$ & $-14.6$ & $+1.6$ & $-0.4$ \\
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{paper/results/cross_model/cross_model_union_overlap_plot.png}
+\includegraphics[width=\textwidth]{figures/cross_model_union_overlap_plot.png}
 \caption{Full $K$-sweep version of \Cref{fig:overlap}.}
 \label{fig:overlap-app}
 \end{figure}
@@ -338,7 +338,7 @@ Mistral-7B-Instruct-v0.3    & $-37.0$ & $-14.6$ & $+1.6$ & $-0.4$ \\
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.85\textwidth]{paper/figures/main/fig6_qwen_head_similarity.png}
+\includegraphics[width=0.85\textwidth]{figures/fig6_qwen_head_similarity.png}
 \caption{Per-task Jaccard at top-$K$ on Qwen-2.5-7B-Instruct. The \texttt{headquarters\_city / headquarters\_state / registrant\_name} sub-cluster (top-$16$ Jaccard $\geq 0.45$) is visible at small $K$. The same sub-cluster appears on Llama (top-$16$ \texttt{HQ-city} $\leftrightarrow$ \texttt{HQ-state} $J{=}0.78$) and Mistral. We treat this as a small mechanistic supporting result for the within-model substrate, not a headline.}
 \end{figure}
 
