@@ -10,6 +10,10 @@
 \usepackage{hyperref}
 \newcommand{\theHalgorithm}{\arabic{algorithm}}
 
+% Pill-style highlight for task references (gray-bg monospace).
+% xcolor is loaded by icml2026.sty.
+\newcommand{\taskpill}[1]{\colorbox{gray!15}{\texttt{\small #1}}}
+
 % Blind submission
 \usepackage{icml2026}
 
@@ -57,14 +61,14 @@
 \printAffiliationsAndNotice{}
 
 \begin{abstract}
-Recent work identifies sparse subsets of attention heads---``retrieval heads''---that are causally responsible for long-context fact extraction. We ask how these heads organize across tasks and across models. On a controlled benchmark of eight fact-extraction tasks built from SEC 10-K filings, we ablate query-focused retrieval heads in four open-weights $7$--$8$B language models and report an asymmetric conservation result: after $K$-residualization, target-task fragility (which tasks collapse under ablation) correlates across model pairs with $R^2$ up to $0.59$, while source-task efficacy (which heads disrupt) correlates with $R^2$ at most $0.15$, and cross-model retrieval-head pools overlap at or below random expectation. Fragility does not correlate with baseline task accuracy ($r{=}{-}0.09$, $p{=}0.83$) but correlates negatively with within-document query-to-answer distance ($r{=}{-}0.72$, $p{=}0.04$). We interpret these findings as evidence that $7$--$8$B models implement long-context fact extraction with different head populations while preserving a structural task-vulnerability hierarchy that depends on properties of the retrieval task itself rather than its implementation.
-\end{abstract}
+  Recent work identifies sparse subsets of attention heads---``retrieval heads''---that are important for long-context fact extraction. We ask how these heads organize across tasks and across models. On a controlled benchmark of eight fact-extraction tasks built from SEC 10-K filings, we ablate query-focused retrieval heads in \textcolor{red}{depends on OLMO}four open-weights $7$--$8$B language models and report an asymmetric conservation result: after $K$-residualization, target-task fragility (which tasks collapse under ablation) correlates across model pairs with $R^2$ up to $0.59$, while source-task efficacy (which heads disrupt) correlates with $R^2$ at most $0.15$, and cross-model retrieval-head pools overlap at or below random expectation. Fragility does not correlate with baseline task accuracy ($r{=}{-}0.09$, $p{=}0.83$) but correlates negatively with within-document query-to-answer distance ($r{=}{-}0.72$, $p{=}0.04$). We interpret these findings as evidence that $7$--$8$B models implement long-context fact extraction with different head populations while preserving a structural task-vulnerability hierarchy that depends on properties of the retrieval task itself rather than its implementation.
+  \end{abstract}
 
 \section{Introduction}
 
 Recent work treats long-context retrieval in transformer language models as the action of a sparse subset of attention heads \citep{wu2024retrieval, zhang2025qrhead}, and downstream methods exploit these ``retrieval heads'' for KV-cache compression \citep{fu2024headkv} and other purposes. Implicit in much of this work is a treatment of retrieval heads as a roughly uniform feature, found in any long-context-capable model. Whether per-task detected head sets actually behave like task-specific computational units, like a shared substrate, or like a coincidence of independent detectors---and whether they are conserved across model families---has not, to our knowledge, been measured directly.
 
-We test these questions on a controlled benchmark. Using EDGAR-CORPUS \citep{loukas2021edgar} we construct a long-context Needle-in-a-Haystack evaluation in which eight fact-extraction tasks (e.g., \texttt{registrant\_name}, \texttt{ceo\_lastname}, \texttt{employees\_count\_total}) share document context but differ in answer type and retrieval span. We detect retrieval heads per-task per-model using QRScore \citep{zhang2025qrhead}, ablate the top-$K$ heads of one task while evaluating on another, and repeat across four open-weights $7$--$8$B models.
+We test these questions on a controlled benchmark. Using EDGAR-CORPUS \citep{loukas2021edgar} we construct a long-context Needle-in-a-Haystack evaluation in which eight fact-extraction tasks (e.g., \taskpill{registrant\_name}, \taskpill{ceo\_lastname}, \taskpill{employees\_count\_total}) share document context but differ in answer type and retrieval span. We detect retrieval heads per-task per-model using QRScore \citep{zhang2025qrhead}, ablate the top-$K$ heads of one task while evaluating on another, and repeat across four open-weights $7$--$8$B models\textcolor{red}{ [overclaim? only three are end-to-end; OLMo is overlap-only --- see Methods]}.
 
 Three findings drive the paper:
 \begin{enumerate}
@@ -89,7 +93,7 @@ We do not claim circuit-level understanding. The evidence is ablation-only, the 
 \section{Methods}
 \label{sec:methods}
 
-\paragraph{Benchmark.} From EDGAR-CORPUS \citep{loukas2021edgar} we derive a long-context fact-extraction benchmark with eight tasks: \texttt{registrant\_name}, \texttt{headquarters\_city}, \texttt{headquarters\_state}, \texttt{incorporation\_state}, \texttt{incorporation\_year}, \texttt{employees\_count\_total}, \texttt{ceo\_lastname}, and \texttt{holder\_record\_amount}. Each evaluation instance pairs a query with a long-context haystack of one gold section concatenated with distractor sections drawn from the same filing. The needle is inserted at the document midpoint to standardize positional confounds. We use a leakage-controlled split (no filing overlap between detection and evaluation) and report on $n{=}192$ Llama instances ($24$ per task) for the apples-to-apples comparison and $n{=}241$ for Qwen.
+\paragraph{Benchmark.} From EDGAR-CORPUS \citep{loukas2021edgar} we derive a long-context fact-extraction benchmark with eight tasks: \taskpill{registrant\_name}, \taskpill{headquarters\_city}, \taskpill{headquarters\_state}, \taskpill{incorporation\_state}, \taskpill{incorporation\_year}, \taskpill{employees\_count\_total}, \taskpill{ceo\_lastname}, and \taskpill{holder\_record\_amount}. Each evaluation instance pairs a query with a long-context haystack of one gold section concatenated with distractor sections drawn from the same filing. The needle is inserted at the document midpoint to standardize positional confounds. We use a leakage-controlled split (no filing overlap between detection and evaluation) and report on $n{=}192$ Llama instances ($24$ per task) for the per-method comparison and $n{=}241$ for Qwen.
 
 \paragraph{Models.} Llama-3.1-8B-Instruct, Qwen2.5-7B-Instruct, and Mistral-7B-Instruct-v0.3 are evaluated end-to-end (detection $\to$ ablation $\to$ transfer). OLMo-7B-Instruct is evaluated for head-identity overlap only. Architectural details and head counts are tabulated in \Cref{app:models}.
 
@@ -110,8 +114,8 @@ We do not claim circuit-level understanding. The evidence is ablation-only, the 
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\columnwidth]{figures/main/fig1_apples_to_apples_llama.pdf}
-\caption{Apples-to-apples accuracy curves on the Llama-3.1-8B-Instruct $n{=}192$ SEC subset. QRScore-SEC and QRScore-LME ablations cause large drops; QRScore-NQ ablation is statistically indistinguishable from the random baseline at small $K$. The QRScore-LME effect on Llama is much larger than on Qwen or Mistral (\Cref{sec:limitations}). LME and NQ are evaluated on the same $192$ SEC instances to avoid mixing baselines.}
+\includegraphics[width=\columnwidth]{figures/fig1_apples_to_apples_llama.pdf}
+\caption{Per-method accuracy curves on the Llama-3.1-8B-Instruct $n{=}192$ SEC subset. QRScore-SEC and QRScore-LME ablations cause large drops; QRScore-NQ ablation is statistically indistinguishable from the random baseline at small $K$. The QRScore-LME effect on Llama is much larger than on Qwen or Mistral (\Cref{sec:limitations}). LME and NQ are evaluated on the same $192$ SEC instances to avoid mixing baselines.}
 \label{fig:apples}
 \end{figure}
 
@@ -124,7 +128,7 @@ The cross-task transfer matrix shows that this effect is broadly distributed wit
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.92\textwidth]{figures/main/fig2_kfe_asymmetry.pdf}
+\includegraphics[width=0.92\textwidth]{figures/fig2_kfe_asymmetry.pdf}
 \caption{$K$-residualized cross-model correlations of (left) target sensitivity, the per-task column mean of the drop matrix, and (right) source efficacy, the per-task off-target row mean. Each point is one (task, $K$) cell. Target sensitivity correlates substantially across all three model pairs ($R^2 = 0.18$--$0.59$); source efficacy is essentially uncorrelated ($R^2 \leq 0.15$). The asymmetry in $R^2$ is $4$--$12\times$. Full breakdown in \Cref{app:kfe}.}
 \label{fig:kfe}
 \end{figure*}
@@ -138,7 +142,7 @@ This asymmetry is not a numerical artefact of the residualization. Of the four c
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\columnwidth]{figures/main/fig3_cross_model_overlap.png}
+\includegraphics[width=\columnwidth]{figures/cross_model_union_overlap_plot.png}
 \caption{Cross-model union-overlap of per-model retrieval-head pools $U_M(K) = \bigcup_t \mathcal{H}^{(t)}_K$. \textbf{Left}: Jaccard for matched-population pairs (Llama / Mistral / OLMo-Instruct, all $1024$ heads). \textbf{Right}: overlap coefficient for all four models including Qwen ($784$ heads). Dotted lines are empirical random expectation from $1000$ random subset pairs. At $K{=}16$, observed lifts above random are $0.0\times$--$1.7\times$ across pairs.}
 \label{fig:overlap}
 \end{figure}
@@ -148,14 +152,14 @@ If the conserved target sensitivity in \Cref{fig:kfe} reflected a shared physica
 \subsection{Predicting fragility from task structure, not difficulty}
 \label{sec:predictors}
 
-If conserved fragility were merely a re-expression of conserved task difficulty, fragility should track baseline accuracy. It does not: the cross-model fragility-vs-baseline-accuracy correlation is $r = -0.09$ ($p = 0.83$, $n=8$). Tasks with high baseline accuracy can be either fragile (\texttt{employees\_count\_total}, baseline $0.93$, fragility $0.69$) or robust (\texttt{registrant\_name}, baseline $0.96$, fragility $0.11$); the fragility hierarchy is not a difficulty hierarchy.
+If conserved fragility were merely a re-expression of conserved task difficulty, fragility should track baseline accuracy. It does not: the cross-model fragility-vs-baseline-accuracy correlation is $r = -0.09$ ($p = 0.83$, $n=8$). Tasks with high baseline accuracy can be either fragile (\taskpill{employees\_count\_total}, baseline $0.93$, fragility $0.69$) or robust (\taskpill{registrant\_name}, baseline $0.96$, fragility $0.11$); the fragility hierarchy is not a difficulty hierarchy.
 
-A simple structural feature does correlate. The median word-distance from a task-keyword's first occurrence in the haystack to the answer's first occurrence is strongly negatively associated with fragility: $r = -0.72$, $p = 0.04$ Pearson; $\rho = -0.71$, $p = 0.05$ Spearman (scatter plot in \Cref{app:predict-fig}). Tasks where the answer is far from query keywords (e.g., \texttt{headquarters\_state} at distance $856$, fragility $0.22$; \texttt{registrant\_name} at $519$, fragility $0.11$) are robust to ablation. Tasks where the answer sits close to the query keyword (e.g., \texttt{employees\_count\_total} at distance $64$, fragility $0.69$; \texttt{ceo\_lastname} at $9$, fragility $0.43$) are fragile. We interpret this as evidence that close-attention retrieval relies on a more concentrated head population, while distance-spanning retrieval is more distributed and therefore more redundant. The correlation should be read as suggestive given $n{=}8$ tasks; it is reported here because it survives a Bonferroni-style adjustment for the three tested predictors only on the Pearson side ($p = 0.04 \times 3 = 0.13$, marginal).
+A simple structural feature does correlate. The median word-distance from a task-keyword's first occurrence in the haystack to the answer's first occurrence is strongly negatively associated with fragility: $r = -0.72$, $p = 0.04$ Pearson; $\rho = -0.71$, $p = 0.05$ Spearman (scatter plot in \Cref{app:predict-fig}). Tasks where the answer is far from query keywords (e.g., \taskpill{headquarters\_state} at distance $856$, fragility $0.22$; \taskpill{registrant\_name} at $519$, fragility $0.11$) are robust to ablation. Tasks where the answer sits close to the query keyword (e.g., \taskpill{employees\_count\_total} at distance $64$, fragility $0.69$; \taskpill{ceo\_lastname} at $9$, fragility $0.43$) are fragile. We interpret this as evidence that close-attention retrieval relies on a more concentrated head population, while distance-spanning retrieval is more distributed and therefore more redundant. The correlation should be read as suggestive given $n{=}8$ tasks; it is reported here because it survives a Bonferroni-style adjustment for the three tested predictors only on the Pearson side ($p = 0.04 \times 3 = 0.13$, marginal).
 
 \section{Limitations}
 \label{sec:limitations}
 
-\paragraph{Ablation only.} We measure the population-level effect of head removal on accuracy. We do not perform causal patching, attention-pattern decomposition, or feature-level analysis, and we therefore do not claim circuit-level understanding. Following \citet{sharkey2025openproblems} we use ``head population'' and ``substrate'' rather than ``circuit.'' All four models are $7$--$8$B parameters; whether the asymmetry persists at frontier scale is open.
+\paragraph{Ablation only.} We measure the population-level effect of head removal on accuracy. We do not perform causal patching, attention-pattern decomposition, or feature-level analysis, and we therefore do not claim circuit-level understanding. Following \citet{sharkey2025openproblems} we use ``head population'' and ``substrate'' rather than ``circuit.'' All four models are $7$--$8$B parameters\textcolor{red}{ [three end-to-end + OLMo overlap-only --- consider rephrasing to avoid the overclaim]}; whether the asymmetry persists at frontier scale is open.
 
 \paragraph{Statistical power.} Cross-task correlations use $n{=}8$ tasks; the predictive-fragility correlation in \Cref{sec:predictors} (scatter in \Cref{app:predict-fig}) is $p = 0.04$ before multiple-comparison correction. We treat \Cref{sec:predictors} as suggestive rather than confirmatory.
 
@@ -163,7 +167,7 @@ A simple structural feature does correlate. The median word-distance from a task
 
 \section{Conclusion}
 
-In four open-weights $7$--$8$B language models, retrieval-head ablation evidence is consistent with the following picture: each model has a within-domain shared retrieval substrate, the substrates differ in their physical head identities across models, but the resulting task-vulnerability hierarchy is preserved. The hierarchy is not a difficulty hierarchy and is partially predicted by within-document query-to-answer distance. We take this as a small piece of evidence that long-context fact extraction is implementation-variant but task-structurally constrained. The open mechanistic question is what, beyond retrieval distance, makes specific tasks structurally fragile under any retrieval-head intervention.
+In four open-weights $7$--$8$B language models\textcolor{red}{ [three with full ablation pipeline; OLMo overlap-only --- same overclaim as in abstract/intro/limitations]}, retrieval-head ablation evidence is consistent with the following picture: each model has a within-domain shared retrieval substrate, the substrates differ in their physical head identities across models, but the resulting task-vulnerability hierarchy is preserved. The hierarchy is not a difficulty hierarchy and is partially predicted by within-document query-to-answer distance. We take this as a small piece of evidence that long-context fact extraction is \textcolor{red}{implementation-variant [defend ``implementation'' or soften? reviewer flag]} but task-structurally constrained. The open mechanistic question is what, beyond retrieval distance, makes specific tasks structurally fragile under any retrieval-head intervention.
 
 \clearpage
 
@@ -193,7 +197,7 @@ Qwen2.5-7B-Instruct        & 28 & 28 & 4  & 784 \\
 \caption{Model architectural statistics. Query heads are the units of ablation.}
 \end{table}
 
-\paragraph{Per-model evaluation set sizes.} Llama: $n{=}192$ ($24/\text{task}$). Qwen: $n{=}241$ (per-task counts $24$--$41$). Mistral: $n{=}192$. OLMo: head-identity analysis only, no ablation pipeline. The apples-to-apples comparison in \Cref{fig:apples} restricts LME and NQ accuracy to the $192$ Llama SEC instances to avoid mixing baselines.
+\paragraph{Per-model evaluation set sizes.} Llama: $n{=}192$ ($24/\text{task}$). Qwen: $n{=}241$ (per-task counts $24$--$41$). Mistral: $n{=}192$. OLMo: head-identity analysis only, no ablation pipeline. The per-method comparison in \Cref{fig:apples} restricts LME and NQ accuracy to the $192$ Llama SEC instances to avoid mixing baselines.
 
 \paragraph{Reproducibility.} All ablation results were generated by an end-to-end head-knockout pipeline that registers forward pre-hooks on each layer's $o_{\text{proj}}$, zeroing out the slices corresponding to ablated heads. Per-model detection JSONs (top-$K$ heads per task) drive the ablation. The $K$-fixed-effects analysis flattens each model's drop matrix to a $56$-element vector after subtracting within-$K$ task means, and reports Pearson $R^2$ across model pairs.
 
@@ -233,14 +237,14 @@ A verification harness asserts that all six rows reproduce within $\text{EPS}=0.
 \toprule
 \textbf{Source task} & \textbf{On-target drop} & \textbf{Off-target mean} & \textbf{Specificity} & \textbf{$95\%$ CI} \\
 \midrule
-\texttt{headquarters\_city}      & 0.50  & 0.52  & $-0.02$ & $[-0.23, +0.21]$ \\
-\texttt{headquarters\_state}     & 0.21  & 0.63  & $\mathbf{-0.42}$ & $[-0.57, -0.27]$ \\
-\texttt{registrant\_name}        & 0.17  & 0.33  & $\mathbf{-0.17}$ & $[-0.34, -0.02]$ \\
-\texttt{employees\_count\_total} & 0.08  & 0.02  & $\mathbf{+0.06}$ & $[+0.03, +0.09]$ \\
-\texttt{holder\_record\_amount}  & 0.04  & $-0.01$ & $\mathbf{+0.05}$ & $[+0.03, +0.07]$ \\
-\texttt{ceo\_lastname}           & $-0.04$ & 0.04 & $\mathbf{-0.08}$ & $[-0.10, -0.06]$ \\
-\texttt{incorporation\_state}    & 0.00  & 0.03  & $-0.03$ & $[-0.06, 0.00]$  \\
-\texttt{incorporation\_year}     & 0.00  & 0.01  & $-0.01$ & $[-0.04, +0.02]$ \\
+\taskpill{headquarters\_city}      & 0.50  & 0.52  & $-0.02$ & $[-0.23, +0.21]$ \\
+\taskpill{headquarters\_state}     & 0.21  & 0.63  & $\mathbf{-0.42}$ & $[-0.57, -0.27]$ \\
+\taskpill{registrant\_name}        & 0.17  & 0.33  & $\mathbf{-0.17}$ & $[-0.34, -0.02]$ \\
+\taskpill{employees\_count\_total} & 0.08  & 0.02  & $\mathbf{+0.06}$ & $[+0.03, +0.09]$ \\
+\taskpill{holder\_record\_amount}  & 0.04  & $-0.01$ & $\mathbf{+0.05}$ & $[+0.03, +0.07]$ \\
+\taskpill{ceo\_lastname}           & $-0.04$ & 0.04 & $\mathbf{-0.08}$ & $[-0.10, -0.06]$ \\
+\taskpill{incorporation\_state}    & 0.00  & 0.03  & $-0.03$ & $[-0.06, 0.00]$  \\
+\taskpill{incorporation\_year}     & 0.00  & 0.01  & $-0.01$ & $[-0.04, +0.02]$ \\
 \bottomrule
 \end{tabular}
 \caption{Specificity index = on-target drop $-$ off-target mean drop, at $K{=}16$ on Llama-3.1-8B-Instruct. Negative entries indicate broad collateral damage; bold entries have $95\%$ bootstrap CIs that exclude zero.}
@@ -252,7 +256,7 @@ A verification harness asserts that all six rows reproduce within $\text{EPS}=0.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{figures/main/fig4_predictive_fragility.png}
+\includegraphics[width=\textwidth]{figures/scatter_plots.png}
 \caption{Cross-model fragility (mean target sensitivity across the three models, $K \in \{8, 16\}$) plotted against three candidate predictors. Fragility does not correlate with baseline task accuracy ($r{=}{-}0.09$, $p{=}0.83$) but correlates negatively with within-document query-to-answer word distance ($r{=}{-}0.72$, $p{=}0.04$) and answer token length ($r{=}{-}0.64$, $p{=}0.09$). The eight task labels are visible on each panel.}
 \label{fig:predict-app}
 \end{figure}
@@ -260,17 +264,20 @@ A verification harness asserts that all six rows reproduce within $\text{EPS}=0.
 \section{Cross-task transfer heatmap and per-task curves}
 \label{app:transfer}
 
+\Cref{fig:transfer-heatmap} shows the source $\times$ target drop matrix on Llama at $K{=}16$, the data underlying the within-model substrate claim in \Cref{sec:within-model}. \Cref{fig:per-task-curves} resolves the same data per target task across the full $K$ sweep.
+
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.62\textwidth]{figures/main/fig5_llama_transfer_K16.png}
+\includegraphics[width=0.62\textwidth]{figures/fig3_llama_transfer_K16.png}
 \caption{Cross-task transfer drop matrix at $K{=}16$ on Llama. Rows are source tasks (heads ablated); columns are target tasks (evaluation). Random-seed rows at the bottom serve as the random-ablation control. Off-diagonal cells are typically as red as on-diagonal cells---the substrate effect.}
-\label{fig:transfer}
+\label{fig:transfer-heatmap}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.85\textwidth]{figures/main/fig6_llama_per_task_curves.png}
-\caption{Per-task accuracy curves for QRScore-SEC ablation on Llama. Shaded bands are bootstrap $95\%$ CIs. Numeric/name tasks (\texttt{employees\_count\_total}, \texttt{ceo\_lastname}) collapse rapidly; entity tasks (\texttt{headquarters\_state}, \texttt{registrant\_name}) degrade gradually. The $K{=}64$ bump on the pooled curve is sampling noise (Findings note).}
+\includegraphics[width=0.85\textwidth]{figures/fig2_llama_per_task_curves.png}
+\caption{Per-task accuracy curves for QRScore-SEC ablation on Llama. Shaded bands are bootstrap $95\%$ CIs. Numeric/name tasks (\taskpill{employees\_count\_total}, \taskpill{ceo\_lastname}) collapse rapidly; entity tasks (\taskpill{headquarters\_state}, \taskpill{registrant\_name}) degrade gradually. The $K{=}64$ bump on the pooled curve is sampling noise (Findings note).}
+\label{fig:per-task-curves}
 \end{figure}
 
 \section{Negative result: layer position does not separate fragile from robust tasks}
@@ -296,14 +303,14 @@ Qwen2.5-7B-Instruct   & 1.738 & 1.718 & 0.942 & 0.686 \\
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{figures/main/fig7_layer_fragile_vs_robust.png}
+\includegraphics[width=\textwidth]{figures/fragile_vs_robust_overlay.png}
 \caption{Fragile (blue) and robust (orange) per-task layer distributions on a relative-depth axis. The two distributions are visually similar within each model. We do not detect a fragility signature in layer position.}
 \end{figure}
 
 \section{LME and NQ paradigm transfer is model-dependent}
 \label{app:lme-nq}
 
-\Cref{tab:lme-nq} contrasts the apples-to-apples ($n{=}192$ SEC subset) drop at $K{=}16$ for QRScore-LME, QRScore-NQ, and the three-seed random baseline across the three models with full pipelines.
+\Cref{tab:lme-nq} contrasts the per-method drop at $K{=}16$ on the $n{=}192$ SEC subset for QRScore-LME, QRScore-NQ, and the three-seed random baseline across the three models with full pipelines.
 
 \begin{table}[h]
 \centering
@@ -322,24 +329,27 @@ Mistral-7B-Instruct-v0.3    & $-37.0$ & $-14.6$ & $+1.6$ & $-0.4$ \\
 \end{table}
 
 \section{Cross-model union overlap, all $K$}
-\label{app:overlap}
+\label{app:overlap-all}
 
-\Cref{fig:overlap-app} plots the same data as \Cref{fig:overlap} for all $K \in \{8, 16, 32, 48, 64, 96, 128\}$. Lifts above random expectation rise modestly at large $K$ (mechanically, as the per-model unions cover an increasing fraction of the head population) but stay $\leq 2\times$ throughout.
+\Cref{fig:overlap-all} extends \Cref{fig:overlap} from the body to the full $K$ sweep. Lifts above random rise modestly with $K$ (mechanically, as the per-model unions cover a larger fraction of the head population) but stay $\leq 2\times$ across all $K \in \{8, 16, 32, 48, 64, 96, 128\}$ for every model pair.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{figures/main/fig3_cross_model_overlap.png}
+\includegraphics[width=\textwidth]{figures/cross_model_union_overlap_plot.png}
 \caption{Full $K$-sweep version of \Cref{fig:overlap}.}
-\label{fig:overlap-app}
+\label{fig:overlap-all}
 \end{figure}
 
 \section{Geographic head sub-cluster}
 \label{app:cluster}
 
+\Cref{fig:cluster} shows per-task head-set Jaccard at top-$K$ on Qwen-2.5-7B-Instruct. The \taskpill{headquarters\_city} / \taskpill{headquarters\_state} / \taskpill{registrant\_name} sub-cluster is visible at small $K$ (top-$16$ Jaccard $\geq 0.45$ among that triple) and recurs in Llama (top-$16$ \taskpill{HQ-city} $\leftrightarrow$ \taskpill{HQ-state} $J{=}0.78$) and Mistral. We treat this as a small mechanistic supporting result for the within-model shared pool in \Cref{sec:within-model}, not a headline.
+
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.85\textwidth]{figures/main/fig8_qwen_head_similarity.png}
-\caption{Per-task Jaccard at top-$K$ on Qwen-2.5-7B-Instruct. The \texttt{headquarters\_city / headquarters\_state / registrant\_name} sub-cluster (top-$16$ Jaccard $\geq 0.45$) is visible at small $K$. The same sub-cluster appears on Llama (top-$16$ \texttt{HQ-city} $\leftrightarrow$ \texttt{HQ-state} $J{=}0.78$) and Mistral. We treat this as a small mechanistic supporting result for the within-model substrate, not a headline.}
+\includegraphics[width=0.85\textwidth]{figures/fig6_qwen_head_similarity.png}
+\caption{Per-task Jaccard at top-$K$ on Qwen-2.5-7B-Instruct. The \taskpill{headquarters\_city} / \taskpill{headquarters\_state} / \taskpill{registrant\_name} sub-cluster (top-$16$ Jaccard $\geq 0.45$) is visible at small $K$. The same sub-cluster appears on Llama (top-$16$ \taskpill{HQ-city} $\leftrightarrow$ \taskpill{HQ-state} $J{=}0.78$) and Mistral. We treat this as a small mechanistic supporting result for the within-model substrate, not a headline.}
+\label{fig:cluster}
 \end{figure}
 
 \section{Reproducibility}
